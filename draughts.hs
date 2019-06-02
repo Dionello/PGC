@@ -12,21 +12,25 @@ type Coord = (Int,Int)
 
 type Move = (Coord, Coord)
 
--- isIn: retorna False caso a coordenada esteja dentro do tabuleiro, e True caso esteja.
-isIn :: Coord -> Board -> Bool
-coord `isIn` board 
-        | (fst coord >= l) = False
-        | (snd coord >= l) = False
+-- notIn: retorna True caso a coordenada esteja dentro do tabuleiro, e False caso esteja.
+notIn :: Coord -> Board -> Bool
+coord `notIn` board 
+        | (fst coord >= l) = True
+        | (snd coord >= l) = True
         | otherwise        = True
         where l = length board
+        
+-- isValid verifica se uma jogada é valida
+--
+--isValid :: Move -> Board -> Bool
+--isValid move board | (fst move) `notIn` Board = False
+--                   | (snd move) `notIn` Board = False
+--                   |
 
 isValid :: Move -> Board -> Bool
-isValid move board | initial `notIn` Board = False
-                   | final   `notIn` Board = False
+isValid move board | (fst move) `notIn` Board = False
+                   | (snd move) `notIn` Board = False
                    |
-
-                   where initial = (fst move), final = (snd move)
-
 
 
 makeMove :: Move -> Board -> Board
