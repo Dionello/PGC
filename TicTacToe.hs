@@ -26,9 +26,9 @@ isValid (mk,cd) board
 -- verifica se uma jogada é válida no tabuleiro atual
 
 makeMove :: Move -> Board -> Board
-makeMove (mk,(x,y)) board
-            | isValid (mk,(x,y)) board 
-              = take x a ++ (
+makeMove (mk,(x,y)) bd
+            | isValid (mk,(x,y)) bd
+              = take x bd ++ (take y (bd!!x) ++) ++ drop (x+1) a
 -- executa uma jogada no tabuleiro
 --isOver :: Board -> Bool
 -- verifica se o jogo terminou
