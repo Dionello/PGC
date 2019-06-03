@@ -10,7 +10,12 @@ emptyBoard n = [[ Nothing | x <- [1..n]] | y <- [1..n]]
 
 type Coord = (Int,Int)
 
-type Move = (Coord, Coord)
+--opção 1:
+data TypeMove = Walk | Jump
+type Move = (Coord, Typemove, Coord)
+
+--opção 2:
+data Move = Walk Coord Coord | Jump Coord Coord
 
 -- notIn: retorna True caso a coordenada esteja dentro do tabuleiro, e False caso esteja.
 notIn :: Coord -> Board -> Bool
