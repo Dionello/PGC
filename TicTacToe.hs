@@ -14,7 +14,7 @@ coord `notIn` board
         | (snd coord >= l) = True
         | otherwise        = False
         where l = length board
---verificada se a coordenada passada está dentro do tabuleiro
+--verifica se a coordenada passada está dentro do tabuleiro
 
 spaceAt :: Coord -> Board -> Maybe Mark
 spaceAt (x,y) board = (board !! x) !! y
