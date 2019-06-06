@@ -20,15 +20,21 @@ spaceAt (x,y) board = (board !! x) !! y
 
 isValid :: Move -> Board -> Bool
 isValid (mk,cd) board
-            | cd `notIn` board            = False
-            | spaceAt cd board == Nothing = True
-            | otherwise                   = False
+            | cd `notIn` board                = False
+            | spaceAt cd board == Just Nought = False
+            | spaceAt cd board == Just Cross  = False
+            | otherwise                       = True
 -- verifica se uma jogada é válida no tabuleiro atual
+
+insertAt :: Mark -> Coord -> Board -> Board
+insertAt mk (x,y) bd 
+        = take x bd ++ [(take y lineX ++ [Just mk] ++ drop (y+1) lineX)] ++ drop (x+1) bd 
+        where lineX = bd !! x
 
 makeMove :: Move -> Board -> Board
 makeMove (mk,(x,y)) bd
             | isValid (mk,(x,y)) bd
-              = take x bd ++ (take y (bd!!x) ++) ++ drop (x+1) a
+              = insertAt mk (x,y) bd
 -- executa uma jogada no tabuleiro
 --isOver :: Board -> Bool
 -- verifica se o jogo terminou
