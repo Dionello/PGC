@@ -22,7 +22,7 @@ notIn :: Coord -> Board -> Bool
 coord `notIn` board 
         | (fst coord >= l) = True
         | (snd coord >= l) = True
-        | otherwise        = True
+        | otherwise        = False
         where l = length board
         
 -- isValid verifica se uma jogada é valida
@@ -40,3 +40,7 @@ isValid move board | (fst move) `notIn` Board = False
 
 makeMove :: Move -> Board -> Board
 
+isOver :: Board -> Bool
+isOver bd | or (map (elem (Just White)) bd) = False
+          | or (map (elem (Just Black)) bd) = False
+          | otherwise                       = True
