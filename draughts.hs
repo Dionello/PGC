@@ -10,12 +10,18 @@ emptyBoard n = [[ Nothing | x <- [1..n]] | y <- [1..n]]
 
 type Coord = (Int,Int)
 
---opção 1:
-data TypeMove = Walk | Jump
-type Move = (Coord, Typemove, Coord)
+data Quadrant = Q1 | Q2 | Q3 | Q4
+data MoveType = Walk | Jump
+type Move = (MoveType, Coord, Quadrant)
 
---opção 2:
-data Move = Walk Coord Coord | Jump Coord Coord
+destination :: Move -> Coord
+destination (Walk,cd,Q1) = ((fst cd+1),(snd cd+1))
+destination (Walk,cd,Q2) = ((fst cd-1),(snd cd+1))
+destination (Walk,cd,Q3) = ((fst cd-1),(snd cd-1))
+destination (Walk,cd,Q4) = ((fst cd+1),(snd cd-1))
+destination (Jump,cd,qd) 
+        = destination (Walk,destination (Walk,cd,qd),qd)
+        --Aplica Walk 2 vezes
 
 -- notIn: retorna True caso a coordenada esteja dentro do tabuleiro, e False caso esteja.
 notIn :: Coord -> Board -> Bool
@@ -24,18 +30,13 @@ coord `notIn` board
         | (snd coord >= l) = True
         | otherwise        = False
         where l = length board
-        
--- isValid verifica se uma jogada é valida
---
---isValid :: Move -> Board -> Bool
---isValid move board | (fst move) `notIn` Board = False
---                   | (snd move) `notIn` Board = False
---                   |
 
+-- Verifica se o movimento pode ser realizado
 isValid :: Move -> Board -> Bool
-isValid move board | (fst move) `notIn` Board = False
-                   | (snd move) `notIn` Board = False
-                   |
+isValid (mv,cd,qd) board | cd `notIn` Board = False
+                         | cd `notIn` Board = False
+                         | destination (mv,cd,qd) `notIn` Board = False
+                         | otherwise = True
 
 
 makeMove :: Move -> Board -> Board
