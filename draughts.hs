@@ -22,9 +22,9 @@ data MoveType = Walk | Jump deriving (Eq)
 type Move = (MoveType, Coord, Quadrant)
 
 destination :: Move -> Coord
-destination (Walk,cd,Q1) = ((fst cd+1),(snd cd-1))
+destination (Walk,cd,Q1) = ((fst cd-1),(snd cd+1))
 destination (Walk,cd,Q2) = ((fst cd-1),(snd cd-1))
-destination (Walk,cd,Q3) = ((fst cd-1),(snd cd+1))
+destination (Walk,cd,Q3) = ((fst cd+1),(snd cd-1))
 destination (Walk,cd,Q4) = ((fst cd+1),(snd cd+1))
 destination (Jump,cd,qd) 
         = destination (Walk,destination (Walk,cd,qd),qd)
