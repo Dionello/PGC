@@ -7,13 +7,11 @@ type Board = [[Maybe Piece]]
 -- o tabuleiro vazio é inicializado com todos os valores Nothing
 emptyBoard :: Int -> Board
 emptyBoard n | n < 4     = error "Please choose a number >=4"
-             | otherwise = [[if (odd (x+y)) then Nothing else (Just White) | x <- [1..n]] 
-             | y <- [1..qntp]]
-             ++ [[ Nothing | x <- [1..n]] | y <- [1..qnte]]
-             ++ [[if (odd (x+y)) then Nothing else (Just Black) | x <- [1..n]] 
-             | y <- [1..qntp]]
-              where qntp = floor ((0.4) * (fromIntegral n))
-                    qnte  = n - (2*qntp)
+             | otherwise = [[if (odd (x+y) || ((y>qntp)&&(y<=(qntp+qnte))))
+             then Nothing else (if (y<=qntp) then (Just White) else (Just Black)) | 
+             x<-[1..n] ] | y<-[1..n] ]
+             where qntp = floor ((0.4) * (fromIntegral n))
+                   qnte  = n - (2*qntp)
 
 type Coord = (Int,Int)
 
@@ -45,7 +43,7 @@ isValid (mv,cd,qd) bd | cd `notIn` bd = False
                       | spaceAt (dest) bd /= Nothing  = False
                       | (mv == Jump) && (spaceAt (destination (Walk,cd,qd)) bd == Nothing) = False
                       | otherwise = True
-                        where dest = destination (mv,cd,qd)
+                      where dest = destination (mv,cd,qd)
 
 -- retorna o símbolo de determinada coordenada do tabuleiro
 spaceAt :: Coord -> Board -> Maybe Piece
@@ -54,7 +52,9 @@ spaceAt (x,y) board = (board !! x) !! y
 -- insere um símbolo em determina coordenada no tabuleiro
 insertAt :: Maybe Piece -> Coord -> Board -> Board
 insertAt p (x,y) bd 
-        = take x bd ++ [(take y lineX ++ [p] ++ drop (y+1) lineX)] ++ drop (x+1) bd 
+        = take x bd 
+        ++ [(take y lineX ++ [p] ++ drop (y+1) lineX)] 
+        ++ drop (x+1) bd 
         where lineX = bd !! x
 
 exchangePositions :: Coord -> Coord -> Board -> Board
@@ -66,8 +66,9 @@ exchangePositions cd1 cd2 bd = insertAt pc2 cd1 (insertAt pc1 cd2 bd)
 makeMove :: Move -> Board -> Board
 makeMove (mv,cd,qd) bd | not (isValid (mv,cd,qd) bd) = error "Move is not valid"
                        | (mv == Walk) = exchangePositions cd dest bd
-                       | otherwise  = exchangePositions cd dest (insertAt Nothing (destination (Walk,cd,qd)) bd)
-                        where dest = destination (mv,cd,qd)
+                       | otherwise   = exchangePositions cd dest 
+                                     $ insertAt Nothing (destination (Walk,cd,qd)) bd
+                       where dest = destination (mv,cd,qd)
                           
 
 -- verifica se o jogo encerrou
