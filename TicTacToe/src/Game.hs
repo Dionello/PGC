@@ -6,8 +6,8 @@ type Board = [[Maybe Mark]]
 
 -- cria um tabuleiro vazio de tamanho n x n
 emptyBoard :: Int -> Board
-emptyBoard n = [ [ Nothing | i<-[0..(n-1)] ]
-                 | j<-[0..(n-1)] ]   
+emptyBoard n = take n $ repeat .
+               take n $ repeat Nothing   
 
 type Coord = (Int,Int)
 
