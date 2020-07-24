@@ -1,9 +1,20 @@
 module Main where
 
 import Game
+--implementação estética do printBoard
+marktoChar :: Maybe Mark -> Char
+marktoChar (Just X)  = 'X'
+marktoChar (Just O)  = 'O'
+marktoChar (Nothing) = ' '
 
---printGrid :: Board -> [IO ()]
---printGrid bd = [print line | line <- bd]
+printLine :: [Maybe Mark] -> IO ()
+printLine [] = putChar '\n'
+printLine (m:ms) = do putChar (marktoChar m)
+                      putChar (if (ms == []) then ' '  else '|')
+                      printLine ms
+
+printBoard :: Board -> IO ()
+printBoard bd = mapM_ printLine bd
 
 main = do
   putStrLn "Tic Tac Toe"
@@ -14,9 +25,9 @@ main = do
   print board
   gameLoop board Cross
   
-changePlayer :: Mark -> Mark
-changePlayer Cross = Nought
-changePlayer Nought = Cross 
+nextPlayer :: Mark -> Mark
+nextPlayer X = O
+nextPlayer O = X
 
 gameLoop :: Board -> Mark -> IO ()
 gameLoop bd mk = do
