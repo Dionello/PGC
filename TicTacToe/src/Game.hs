@@ -1,62 +1,37 @@
-module Game where
+marktoChar :: Maybe Mark -> Char
+marktoChar (Just X)  = 'X'
+marktoChar (Just O)  = 'O'
+marktoChar (Nothing) = ' '
 
-data Mark = Nought | Cross deriving (Show,Eq)
+printLine :: [Maybe Mark] -> IO ()
+printLine [] = putChar '\n'
+printLine (m:ms) = do putChar (marktoChar m)
+                      let c = if (ms /= []) then '|' else ' '
+                      putChar c
+                      printLine ms
 
-type Board = [[Maybe Mark]]
-
--- cria um tabuleiro vazio de tamanho n x n
-emptyBoard :: Int -> Board
-emptyBoard n = take n $ repeat .
-               take n $ repeat Nothing   
-
-type Coord = (Int,Int)
-
-data Move = Move Coord Mark 
-
-inRange :: Coord -> Board -> Bool
-inRange (x,y) bd | x < l && y < l = True
-                 | otherwise      = False
-                 where l = length bd
-
-markAt :: Coord -> [[a]] -> a
-markAt (x,y) bd =  (bd !! x) !! y
-
--- verifica se uma jogada é válida no tabuleiro atual
-isValid :: Move -> Board -> Bool
-isValid (Move cd mk) bd | not (inRange cd bd)       = False
-                        | (markAt cd bd /= Nothing) = False
-                        | otherwise                 = True
+printBoard :: Board -> IO ()
+printBoard bd = mapM_ printLine bd
 
 
-insertAt :: a -> Coord -> [[a]] -> [[a]]
-insertAt a (x,y) mt = take x mt 
-                     ++ [(take y lineX ++ [a] ++ drop (y+1) lineX)] 
-                     ++ drop (x+1) mt
-                     where lineX = mt !! x
+main = do
+  putStrLn "Tic Tac Toe"
+  let board = emptyBoard
+  printBoard board
+  gameLoop board X
 
--- executa uma jogada no tabuleiro
-makeMove :: Move -> Board -> Board
-makeMove (Move cd mk) bd | isValid (Move cd mk) bd
-                            = insertAt (pure mk) cd bd
-                         | otherwise = bd
 
-columns :: [[a]] -> [[a]]
-columns mt = [map (!!x) mt | x<-[0..(length mt -1)] ]
+nextPlayer :: Mark -> Mark
+nextPlayer X = O
+nextPlayer O = X
 
-diagonal :: [[a]] -> [[a]]
-diagonal mt = [ [markAt (i,i) mt | i<-[0..l-1] ],
-              [markAt (i,l-i-1) mt | i<-[l-1,l-2..0] ] ]
-            where l = length mt
-
--- verifica se o jogo terminou
-isOver :: Board -> Bool
-isOver bd = crossWin `elem` bd || 
-            crossWin `elem` (columns bd) ||
-            crossWin `elem` (diagonal bd) ||
-            noughtWin `elem` bd ||
-            noughtWin `elem` (columns bd) ||
-            noughtWin `elem` (diagonal bd) ||
-            not (or (map (Nothing `elem`) bd))
-            where l = length bd
-                  crossWin  = [Just Cross  | i<-[0..l-1]]
-                  noughtWin = [Just Nought | i<-[0..l-1]]
+gameLoop :: Board -> Mark -> IO ()
+gameLoop bd mk = do
+        putStrLn ("make a play " ++ (show mk) )
+        cd <- getLine
+        let cd' = (read cd :: (Int,Int))
+            newbd = makeMove (Move cd' mk) bd
+        printBoard newbd
+        if (isOver newbd)
+                then (putStrLn ((show mk) ++ " is winner"))
+                else (gameLoop newbd (nextPlayer mk))
