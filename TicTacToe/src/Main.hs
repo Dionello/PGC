@@ -10,21 +10,21 @@ marktoChar (Nothing) = ' '
 printLine :: [Maybe Mark] -> IO ()
 printLine [] = putChar '\n'
 printLine (m:ms) = do putChar (marktoChar m)
-                      putChar (if (ms == []) then ' '  else '|')
+                      let c = if (ms /= []) then '|' else ' '
+                      putChar c
                       printLine ms
 
 printBoard :: Board -> IO ()
 printBoard bd = mapM_ printLine bd
 
+
 main = do
   putStrLn "Tic Tac Toe"
-  putStrLn "Choose the board size"
-  nl <- getLine
-  let n = (read nl :: Int) 
-      board = emptyBoard n
-  print board
-  gameLoop board Cross
-  
+  let board = emptyBoard
+  printBoard board
+  gameLoop board X
+
+
 nextPlayer :: Mark -> Mark
 nextPlayer X = O
 nextPlayer O = X
@@ -35,7 +35,7 @@ gameLoop bd mk = do
         cd <- getLine
         let cd' = (read cd :: (Int,Int))
             newbd = makeMove (Move cd' mk) bd
-        print newbd
-        if (isOver newbd) 
-                then (putStrLn ((show mk) ++ " is winner")) 
-                else (gameLoop newbd (changePlayer mk))
+        printBoard newbd
+        if (isOver newbd)
+                then (putStrLn ((show mk) ++ " is winner"))
+                else (gameLoop newbd (nextPlayer mk))
